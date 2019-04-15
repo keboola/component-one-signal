@@ -1,0 +1,32 @@
+{
+  "type": "object",
+  "title": "extractor configuration",
+  "required": [
+    "#api_token",
+    "period_from",
+    "app_ids"
+  ],
+  "properties": {
+    "#api_token": {
+      "type": "string",
+      "title": "API token",
+      "format": "password",
+      "propertyOrder": 200
+    },
+    "period_from": {
+      "type": "string",
+      "title": "Period from date [including]",
+      "description": "Date in YYYY-MM-DD format or dateparser string i.e. 5 days ago, 1 month ago, yesterday, etc. Maybe left empty for unbounded interval. This affects only the Players dataset",
+      "propertyOrder": 300
+    },
+    "app_ids": {
+      "type": "array",
+      "title": "App IDs",
+      "description": "List of APP IDs. If left empty data for all aps will be downloaded.",
+      "items": {
+        "type": "string",
+        "title": "App ID"
+      }
+    }
+  }
+}

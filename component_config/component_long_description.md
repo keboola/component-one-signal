@@ -1,2 +1,5 @@
-Testing functional sample extractor for purposes of the python component template. 
-Implements partial Hubspot extractor using the public sandbox token.
+ Export User or Notification data from OneSignal. Download data from the following API endpoints:
+
+- Apps
+- Players (also known as devices or users)
+- Notifications

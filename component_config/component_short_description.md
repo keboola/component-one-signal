@@ -1,1 +1,1 @@
-Testing functional sample extractor for purposes of the python component template. 
+High volume and reliable push notification service for websites and mobile applications.

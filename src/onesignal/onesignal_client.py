@@ -115,7 +115,7 @@ class OnesignalClient(HttpClientBase):
         res = res.json()
         # download file
         file_url = res['csv_file_url']
-        file_name = os.path.basename(file_url)
+        # file_name = os.path.basename(file_url)
         # get file
 
         r = self._download_file(file_url)

@@ -9,10 +9,7 @@ import sys
 from datetime import datetime
 
 from kbc.env_handler import KBCEnvHandler
-from kbc.result import KBCTableDef
-from kbc.result import ResultWriter
 
-from onesignal import onesignal_client
 from onesignal.onesignal_client import OnesignalClient
 from onesignal.onesignal_result import NotificationsWriter
 
@@ -80,7 +77,8 @@ class Component(KBCEnvHandler):
         logging.info('Extracting notifications')
 
         # writer setup
-        not_writer = NotificationsWriter(self.tables_out_path) #ResultWriter(result_dir_path=self.tables_out_path, table_def=not_table, fix_headers=False, flatten_objects=False)
+        not_writer = NotificationsWriter(
+            self.tables_out_path)
 
         with not_writer:
             for appid in app_ids:
@@ -100,14 +98,15 @@ class Component(KBCEnvHandler):
                 writer.write(res, object_from_arrays=True)
 
     def get_n_store_players_csv(self, app_ids, active_since, extra_fields=None):
-        output_folder = os.path.join(self.tables_out_path)#, 'players')
+        output_folder = os.path.join(self.tables_out_path)  # , 'players')
         res_files = []
         for app_id in app_ids:
             res = self.client.get_n_download_players_csv(app_id, output_folder, extra_fields, active_since)
             res_files.append(res)
 
         logging.info("Storing players manifest file.")
-        self.configuration.write_table_manifest(os.path.join(output_folder, 'players.csv'), primary_key=['id'], incremental=True)
+        self.configuration.write_table_manifest(os.path.join(output_folder, 'players.csv'), primary_key=['id'],
+                                                incremental=True)
 
 
 """

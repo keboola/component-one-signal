@@ -123,7 +123,7 @@ class OnesignalClient(HttpClientBase):
 
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
-        res_file_path = os.path.join(output_folder, file_name)
+        res_file_path = os.path.join(output_folder, 'players.csv.gz')
         open(res_file_path, 'wb').write(r.content)
 
         return res_file_path

@@ -119,6 +119,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         debug = sys.argv[1]
     else:
-        debug = True
+        debug = False
     comp = Component(debug)
     comp.run()

@@ -20,6 +20,7 @@ KEY_API_TOKEN = '#api_token'
 KEY_PERIOD_FROM = 'period_from'
 
 KEY_APP_ID = 'app_id'
+KEY_NOTIFICATIONS = 'notifications'
 
 MANDATORY_PARS = [KEY_API_TOKEN, KEY_APP_ID]
 MANDATORY_IMAGE_PARS = []
@@ -65,7 +66,8 @@ class Component(KBCEnvHandler):
         app_ids = [self.cfg_params[KEY_APP_ID]]
 
         # get all notifications
-        self.get_n_save_notifications(app_ids)
+        if params.get(KEY_NOTIFICATIONS, False):
+            self.get_n_save_notifications(app_ids)
 
         # get csv export
         self.get_n_store_players_csv(app_ids, start_date)

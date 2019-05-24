@@ -4,7 +4,8 @@
   "required": [
     "#api_token",
     "period_from",
-    "app_ids"
+    "app_id",
+    "notifications"
   ],
   "properties": {
     "#api_token": {
@@ -13,16 +14,23 @@
       "format": "password",
       "propertyOrder": 200
     },
+    "app_id": {
+      "type": "string",
+      "title": "App ID",
+      "propertyOrder": 250,
+      "description": "Application ID that is valid for the token used."
+    },
     "period_from": {
       "type": "string",
       "title": "Period from date [including]",
       "description": "Date in YYYY-MM-DD format or dateparser string i.e. 5 days ago, 1 month ago, yesterday, etc. Maybe left empty for unbounded interval. This affects only the Players dataset",
       "propertyOrder": 300
     },
-    "app_ids": {
-      "type": "string",
-      "title": "App ID",
-      "description": "Application ID that is valid for the token used."
+    "notifications": {
+      "type": "boolean",
+      "title": "Download also notifications dataset",
+      "default": true,
+      "propertyOrder": 300
     }
   }
 }

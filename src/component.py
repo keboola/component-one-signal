@@ -105,7 +105,7 @@ class Component(KBCEnvHandler):
             res_files.append(res)
 
         logging.info("Storing players manifest file.")
-        self.configuration.write_table_manifest(os.path.join(output_folder, 'players.csv.gz'), primary_key=['id'],
+        self.configuration.write_table_manifest(os.path.join(output_folder, 'players.csv'), primary_key=['id'],
                                                 incremental=True)
 
 

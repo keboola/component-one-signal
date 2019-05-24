@@ -2,7 +2,13 @@ import json
 import os
 from collections.abc import Iterable
 
+import requests
+import time
 from kbc.client_base import HttpClientBase
+
+WAIT_INTERVAL_SEC = 20
+
+MAX_RETRIES = 20
 
 ENDPOINT_APPS = 'apps'
 ENDPOINT_NOTIFICATIONS = 'notifications'
@@ -105,11 +111,15 @@ class OnesignalClient(HttpClientBase):
         url = self.base_url + ENDPOINT_CSV_EXPORT
 
         res = self.post_raw(url=url, json=body, params={'app_id': app_id})
-        res = self.check_response(res)
+        self.check_response(res)
+        res = res.json()
         # download file
         file_url = res['csv_file_url']
         file_name = os.path.basename(file_url)
-        r = self.get_raw(file_url)
+        # get file
+
+        r = self._download_file(file_url)
+        self.check_response(r)
 
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
@@ -118,10 +128,27 @@ class OnesignalClient(HttpClientBase):
 
         return res_file_path
 
+    def _download_file(self, file_url):
+        retry = 0
+        retry_again = True
+        header = {"Content-Type": "application/gzip"}
+        while retry_again:
+            time.sleep(WAIT_INTERVAL_SEC)
+            r = requests.get(file_url, headers=header, allow_redirects=True)
+            if r.status_code > 299:
+                retry += 1
+                retry_again = retry <= MAX_RETRIES
+            else:
+                retry_again = False
+
+        if r.status_code < 300:
+            return r
+        else:
+            raise self.ClientError(F"Download of the result CSV file failed. {r.status_code}. {r.content}")
+
     def check_response(self, resp):
         if resp.status_code > 299:
-            raise self.ClientError(F"Request failed with code {resp.status_code}. {resp.json()}")
-        return resp.json()
+            raise self.ClientError(F"Request failed with code {resp.status_code}. {resp.content}")
 
     def get_notifications(self, app_id, kind=None) -> Iterable:
         """

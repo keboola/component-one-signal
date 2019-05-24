@@ -19,9 +19,9 @@ from onesignal.onesignal_client import OnesignalClient
 KEY_API_TOKEN = '#api_token'
 KEY_PERIOD_FROM = 'period_from'
 
-KEY_APP_IDS = 'app_ids'
+KEY_APP_ID = 'app_id'
 
-MANDATORY_PARS = [KEY_API_TOKEN]
+MANDATORY_PARS = [KEY_API_TOKEN, KEY_APP_ID]
 MANDATORY_IMAGE_PARS = []
 
 APP_VERSION = '0.0.1'
@@ -58,43 +58,17 @@ class Component(KBCEnvHandler):
         if self.cfg_params.get(KEY_PERIOD_FROM):
             start_date, end_date = self.get_date_period_converted(params.get(KEY_PERIOD_FROM),
                                                                   datetime.utcnow().strftime('%Y-%m-%d'))
-            start_date = start_date.timestamp()
+            start_date = int(start_date.timestamp())
         else:
             start_date = None
 
-        # get applications
-        app_ids = self.get_n_save_applications()
-
-        # override appids list if specified
-        if self.cfg_params.get(KEY_APP_IDS):
-            app_ids = self.cfg_params[KEY_APP_IDS]
+        app_ids = [self.cfg_params[KEY_APP_ID]]
 
         # get all notifications
         self.get_n_save_notifications(app_ids)
 
         # get csv export
         self.get_n_store_players_csv(app_ids, start_date)
-        logging.info("Extraction finished")
-
-    def get_n_save_applications(self):
-        """
-
-        :return: list of all app ids
-        """
-        logging.info('Extracting applications')
-
-        # table def
-        apps_table = KBCTableDef(name='apps', columns=[], pk='id')
-        # writer setup
-        apps_writer = ResultWriter(result_dir_path=self.tables_out_path, table_def=apps_table, fix_headers=False)
-        app_res = self.client.get_apps()
-        apps_writer.write_all(app_res)
-
-        # store manifest
-        logging.info("Storing Apps manifest file.")
-        self.create_manifests(apps_writer.collect_results())
-
-        return [r['id'] for r in app_res]
 
     def get_n_save_notifications(self, app_ids):
         """
@@ -103,7 +77,7 @@ class Component(KBCEnvHandler):
         logging.info('Extracting notifications')
 
         # table def
-        not_table = KBCTableDef(name='notifications', columns=[], pk='id')
+        not_table = KBCTableDef(name='notifications', columns=[], pk=['id'])
         # writer setup
         not_writer = ResultWriter(result_dir_path=self.tables_out_path, table_def=not_table, fix_headers=False)
 
@@ -125,7 +99,6 @@ class Component(KBCEnvHandler):
                 writer.write(res)
 
     def get_n_store_players_csv(self, app_ids, active_since, extra_fields=None):
-
         output_folder = os.path.join(self.tables_out_path, 'players')
         res_files = []
         for app_id in app_ids:
@@ -133,7 +106,7 @@ class Component(KBCEnvHandler):
             res_files.append(res)
 
         logging.info("Storing players manifest file.")
-        self.configuration.write_table_manifest(output_folder, primary_key='id', incremental=True,
+        self.configuration.write_table_manifest(output_folder, primary_key=['id'], incremental=True,
                                                 columns=onesignal_client.PLAYERS_ALL_FIELDS)
 
 

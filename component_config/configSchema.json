@@ -20,13 +20,9 @@
       "propertyOrder": 300
     },
     "app_ids": {
-      "type": "array",
-      "title": "App IDs",
-      "description": "List of APP IDs. If left empty data for all aps will be downloaded.",
-      "items": {
-        "type": "string",
-        "title": "App ID"
-      }
+      "type": "string",
+      "title": "App ID",
+      "description": "Application ID that is valid for the token used."
     }
   }
 }

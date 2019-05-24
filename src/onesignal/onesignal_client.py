@@ -47,10 +47,16 @@ class OnesignalClient(HttpClientBase):
 
     """
 
+    class ClientError(Exception):
+        """
+        Client error
+        """
+
     def __init__(self, token):
         HttpClientBase.__init__(self, base_url=BASE_URL, max_retries=MAX_RETRIES, backoff_factor=0.3,
                                 status_forcelist=(429, 500, 502, 504),
-                                default_http_header={"Authorization": 'Basic ' + token})
+                                default_http_header={"Authorization": 'Basic ' + token,
+                                                     "Content-Type": "application/json"})
 
     def _get_paged_result_pages(self, endpoint, parameters, res_obj_name, limit_attr, offset_req_attr, offset_resp_attr,
                                 offset, limit):
@@ -78,17 +84,17 @@ class OnesignalClient(HttpClientBase):
             resp_text = str.encode(req.text, 'utf-8')
             req_response = json.loads(resp_text)
 
-            if len(req_response[res_obj_name]) < req_response[limit]:
+            if req_response['total_count'] >= offset:
                 has_more = True
             else:
                 has_more = False
-            offset = req_response[offset_resp_attr]
+            offset += limit
 
             yield req_response[res_obj_name]
 
     def get_n_download_players_csv(self, app_id, output_folder, extra_fields=None, last_active_since=None):
         body = {}
-        if extra_fields:
+        if not extra_fields:
             body['extra_fields'] = PLAYERS_EXTRA_FIELDS
         else:
             body['extra_fields'] = extra_fields
@@ -98,16 +104,24 @@ class OnesignalClient(HttpClientBase):
 
         url = self.base_url + ENDPOINT_CSV_EXPORT
 
-        res = self.post(url=url, data=body, params={'app_id': app_id})
-
+        res = self.post_raw(url=url, json=body, params={'app_id': app_id})
+        res = self.check_response(res)
         # download file
         file_url = res['csv_file_url']
         file_name = os.path.basename(file_url)
         r = self.get_raw(file_url)
+
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
         res_file_path = os.path.join(output_folder, file_name)
-        open(os.path.join(output_folder, file_name), 'wb').write(r.content)
+        open(res_file_path, 'wb').write(r.content)
 
         return res_file_path
+
+    def check_response(self, resp):
+        if resp.status_code > 299:
+            raise self.ClientError(F"Request failed with code {resp.status_code}. {resp.json()}")
+        return resp.json()
 
     def get_notifications(self, app_id, kind=None) -> Iterable:
         """

@@ -55,7 +55,7 @@ class NotificationsWriter(ResultWriter):
             self.data_writer.write(nt_data, user_values={'notification_id': self._get_pkey_values(data, {})})
             self.results = {**self.results, **self.data_writer.results}
 
-        filters = data.pop('filters', 'None')
+        filters = data.pop('filters', None)
         if filters:
             self.filter_writer.write_all(filters, user_values={'notification_id': self._get_pkey_values(data, {})})
             self.results = {**self.results, **self.data_writer.results}

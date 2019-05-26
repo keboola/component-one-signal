@@ -29,7 +29,7 @@ class NotificationsWriter(ResultWriter):
         ResultWriter.__init__(self, result_dir_path=out_path, table_def=not_table, fix_headers=False,
                               flatten_objects=False)
 
-        notifications_data_tbl = KBCTableDef('notification_data', ['denikId', 'notification_id', 'url'],
+        notifications_data_tbl = KBCTableDef('notification_data', ['denikId', 'url'],
                                              ['notification_id'])
         self.data_writer = ResultWriter(out_path, notifications_data_tbl,
                                         exclude_fields=['data'],
@@ -37,7 +37,7 @@ class NotificationsWriter(ResultWriter):
                                         user_value_cols={'notification_id'}, buffer_size=buffer, fix_headers=True)
 
         notifications_filter_tbl = KBCTableDef('notification_filters',
-                                               ['field', 'key', 'notification_id', 'relation', 'value'],
+                                               ['field', 'key', 'relation', 'value'],
                                                ['notification_id'])
         self.filter_writer = ResultWriter(out_path, notifications_filter_tbl,
                                           exclude_fields=['filters'],

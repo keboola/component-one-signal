@@ -2,9 +2,19 @@ from kbc.result import KBCTableDef
 from kbc.result import ResultWriter
 
 # Pkeys
-COMPANY_PK = ['companyId']
-DEAL_PK = ['dealId']
-DEAL_STAGE_HIST_PK = ['Deal_ID', 'sourceVid', 'sourceId', 'timestamp']
+NOTIFICATIONS_COLS = ['adm_big_picture', 'adm_group', 'adm_group_message', 'adm_large_icon', 'adm_small_icon',
+                      'adm_sound', 'alexa_display_title', 'alexa_ssml', 'amazon_background_data',
+                      'android_accent_color', 'android_group', 'android_group_message', 'android_led_color',
+                      'android_sound', 'android_visibility', 'apns_alert', 'app_id', 'app_url', 'big_picture',
+                      'buttons', 'canceled', 'chrome_big_picture', 'chrome_icon', 'chrome_web_badge', 'chrome_web_icon',
+                      'chrome_web_image', 'completed_at', 'content_available', 'contents', 'converted',
+                      'delayed_option', 'delivery_time_of_day', 'errored', 'failed', 'firefox_icon', 'headings', 'id',
+                      'include_external_user_ids', 'include_player_ids', 'ios_attachments', 'ios_badgeCount',
+                      'ios_badgeType', 'ios_category', 'ios_sound', 'isAdm', 'isAlexa', 'isAndroid', 'isChrome',
+                      'isChromeWeb', 'isEdge', 'isFirefox', 'isIos', 'isSafari', 'isWP', 'isWP_WNS', 'large_icon',
+                      'platform_delivery_stats', 'priority', 'queued_at', 'remaining', 'send_after', 'small_icon',
+                      'spoken_text', 'successful', 'tags', 'template_id', 'thread_id', 'ttl', 'url', 'web_buttons',
+                      'web_push_topic', 'web_url', 'wp_sound', 'wp_wns_sound']
 
 """
 Class extending the kbc.result.ResultWriter class to add some additional functionality.
@@ -25,8 +35,8 @@ class NotificationsWriter(ResultWriter):
 
     def __init__(self, out_path, buffer=8192):
         # table def
-        not_table = KBCTableDef(name='notifications', columns=[], pk=['id'])
-        ResultWriter.__init__(self, result_dir_path=out_path, table_def=not_table, fix_headers=False,
+        not_table = KBCTableDef(name='notifications', columns=NOTIFICATIONS_COLS, pk=['id'])
+        ResultWriter.__init__(self, result_dir_path=out_path, table_def=not_table, fix_headers=True,
                               flatten_objects=False)
 
         notifications_data_tbl = KBCTableDef('notification_data', ['denikId', 'url'],

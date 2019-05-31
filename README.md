@@ -14,7 +14,6 @@ Export User or Notification data from OneSignal. Download data from the followin
 
 
 ## Result
-
 ### Players
 Generate players table. 
 

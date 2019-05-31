@@ -18,7 +18,8 @@ Export User or Notification data from OneSignal. Download data from the followin
 ### Players
 Generate players table. 
 
-Returned columns:
+**Returned columns:**
+
 - id
 - identifier
 - session_count

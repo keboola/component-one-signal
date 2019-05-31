@@ -9,11 +9,9 @@ import sys
 from datetime import datetime
 
 from kbc.env_handler import KBCEnvHandler
-from kbc.result import KBCTableDef
-from kbc.result import ResultWriter
 
-from onesignal import onesignal_client
 from onesignal.onesignal_client import OnesignalClient
+from onesignal.onesignal_result import NotificationsWriter
 
 # configuration variables
 KEY_API_TOKEN = '#api_token'
@@ -78,10 +76,9 @@ class Component(KBCEnvHandler):
         """
         logging.info('Extracting notifications')
 
-        # table def
-        not_table = KBCTableDef(name='notifications', columns=[], pk=['id'])
         # writer setup
-        not_writer = ResultWriter(result_dir_path=self.tables_out_path, table_def=not_table, fix_headers=False)
+        not_writer = NotificationsWriter(
+            self.tables_out_path)
 
         with not_writer:
             for appid in app_ids:
@@ -96,20 +93,20 @@ class Component(KBCEnvHandler):
     def _extract_notification_for_app(self, app_id, writer):
         for res in self.client.get_notifications(app_id=app_id):
             if isinstance(res, list):
-                writer.write_all(res)
+                writer.write_all(res, object_from_arrays=True)
             else:
-                writer.write(res)
+                writer.write(res, object_from_arrays=True)
 
     def get_n_store_players_csv(self, app_ids, active_since, extra_fields=None):
-        output_folder = os.path.join(self.tables_out_path, 'players')
+        output_folder = os.path.join(self.tables_out_path)  # , 'players')
         res_files = []
         for app_id in app_ids:
             res = self.client.get_n_download_players_csv(app_id, output_folder, extra_fields, active_since)
             res_files.append(res)
 
         logging.info("Storing players manifest file.")
-        self.configuration.write_table_manifest(output_folder, primary_key=['id'], incremental=True,
-                                                columns=onesignal_client.PLAYERS_ALL_FIELDS)
+        self.configuration.write_table_manifest(os.path.join(output_folder, 'players.csv'), primary_key=['id'],
+                                                incremental=True)
 
 
 """

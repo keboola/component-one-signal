@@ -1,5 +1,7 @@
+import gzip
 import json
 import os
+import shutil
 from collections.abc import Iterable
 
 import requests
@@ -115,7 +117,7 @@ class OnesignalClient(HttpClientBase):
         res = res.json()
         # download file
         file_url = res['csv_file_url']
-        file_name = os.path.basename(file_url)
+        # file_name = os.path.basename(file_url)
         # get file
 
         r = self._download_file(file_url)
@@ -123,8 +125,10 @@ class OnesignalClient(HttpClientBase):
 
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
-        res_file_path = os.path.join(output_folder, file_name)
+        res_file_path = os.path.join(output_folder, 'players.csv.gz')
         open(res_file_path, 'wb').write(r.content)
+
+        self._unzip(res_file_path, res_file_path[:-3])
 
         return res_file_path
 
@@ -145,6 +149,14 @@ class OnesignalClient(HttpClientBase):
             return r
         else:
             raise self.ClientError(F"Download of the result CSV file failed. {r.status_code}. {r.content}")
+
+    def _unzip(self, source_filepath, dest_filepath, block_size=65536):
+        with gzip.open(source_filepath, 'rb') as s_file, \
+                open(dest_filepath, 'wb') as d_file:
+            shutil.copyfileobj(s_file, d_file, block_size)
+
+        # remove source file
+        os.remove(source_filepath)
 
     def check_response(self, resp):
         if resp.status_code > 299:

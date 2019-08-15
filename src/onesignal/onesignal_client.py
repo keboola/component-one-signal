@@ -1,11 +1,11 @@
 import gzip
 import json
 import os
-import shutil
-from collections.abc import Iterable
 
 import requests
+import shutil
 import time
+from collections.abc import Iterable
 from kbc.client_base import HttpClientBase
 
 WAIT_INTERVAL_SEC = 20
@@ -89,6 +89,12 @@ class OnesignalClient(HttpClientBase):
             parameters[limit_attr] = limit
 
             req = self.get_raw(self.base_url + endpoint, params=parameters)
+            try:
+                req.raise_for_status()
+            except requests.HTTPError:
+                # Handle different error codes
+                raise Exception('Request failed with code: {}, message: {}'.format(req.status_code, req.text))
+
             resp_text = str.encode(req.text, 'utf-8')
             req_response = json.loads(resp_text)
 
